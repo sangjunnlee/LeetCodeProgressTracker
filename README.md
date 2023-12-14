@@ -1,1 +1,1 @@
-# FileOrganizer
+# FavoritesAssistant
