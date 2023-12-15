@@ -51,7 +51,30 @@ def update_page(page_id: str, data:dict):
     res = requests.patch(url, json=payload, headers=headers)
     return res
 
+def present_in_database(leetcode_number):
+    filterProperties = {
+        "filter": {
+            "property": "Leetcode_ID",
+            "number": {
+                "equals": leetcode_number
+            }
+        }
+    }
+    url = f"https://api.notion.com/v1/databases/{DATABASE_ID}/query"
+
+    response = requests.post(url, json=filterProperties, headers=headers)
+
+    data = response.json()
+
+    results = data["results"]
+
+    if len(results) == 0:
+        return None
+
+    return results[0]["id"]
+
 def main():
+    print("amin function")    
     parser = argparse.ArgumentParser(
         description = "Generate leetcode question to fill up Notion for tracking of questions")
     parser.add_argument("leetcode_number", type=int, help="leetcode question number")
@@ -63,7 +86,37 @@ def main():
     leetcode_number_input_by_user = args.leetcode_number
     leetcode_comment_input_by_user = args.comment
 
+
     leet_code = get_leetcode_info_by_id(leetcode_number_input_by_user)
 
-    print(leet_code)
+    difficulty = leet_code["difficulty"]
+    name = leet_code["name"]
+    nameForUrl = leet_code["titleSlug"]
+
+    page_id = present_in_database(leetcode_number_input_by_user)
+
+    if page_id is not None:
+        if leetcode_comment_input_by_user != "":
+            updateData = {
+                "Leetcode_ID": {
+                    "number": leetcode_number_input_by_user
+                },
+                "Notes": {"rich_text": [{"text": {"content": leetcode_comment_input_by_user}}]},
+            }
+        else:
+            updateData = {
+                "Leetcode_ID": {
+                    "number": leetcode_number_input_by_user
+                },
+            }
+        update_page(page_id, updateData)
+        print(
+            f'Question {leetcode_number_input_by_user} updated (Last Done) in the Notion database.')
+    else:
+        print("hi")
+
+
+if __name__ == '__main__':
+    main()
+    
 
