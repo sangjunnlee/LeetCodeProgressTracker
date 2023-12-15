@@ -1,6 +1,6 @@
 import requests
 
-NOTION_TOKEN = "secret_cntS6HgntEcYu5ZbqjmOTCImx2aYJpgUgoOfTWdivY0"
+NOTION_TOKEN = 
 DATABASE_ID = "2468f412c6f34e5689004aa283d568ae?pvs=4"
 headers = {
     "Authorization": "Bearer " + NOTION_TOKEN,
