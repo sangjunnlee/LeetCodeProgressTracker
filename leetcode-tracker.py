@@ -51,6 +51,17 @@ def update_page(page_id: str, data:dict):
     res = requests.patch(url, json=payload, headers=headers)
     return res
 
+def create_page(data: dict):
+    create_url = "https://api.notion.com/v1/pages"
+
+    payload = {"parent": 
+                {"type": "database_id",
+                "database_id" : DATABASE_ID}, 
+            "properties": data}
+    res = requests.post(create_url, json = payload, headers = headers)
+
+    return res
+
 def present_in_database(leetcode_number):
     filterProperties = {
         "filter": {
@@ -63,7 +74,6 @@ def present_in_database(leetcode_number):
     url = f"https://api.notion.com/v1/databases/{DATABASE_ID}/query"
 
     response = requests.post(url, json=filterProperties, headers=headers)
-
     data = response.json()
 
     results = data["results"]
@@ -73,8 +83,7 @@ def present_in_database(leetcode_number):
 
     return results[0]["id"]
 
-def main():
-    print("amin function")    
+def main():   
     parser = argparse.ArgumentParser(
         description = "Generate leetcode question to fill up Notion for tracking of questions")
     parser.add_argument("leetcode_number", type=int, help="leetcode question number")
@@ -86,11 +95,10 @@ def main():
     leetcode_number_input_by_user = args.leetcode_number
     leetcode_comment_input_by_user = args.comment
 
-
     leet_code = get_leetcode_info_by_id(leetcode_number_input_by_user)
 
     difficulty = leet_code["difficulty"]
-    name = leet_code["name"]
+    name = leet_code["title"]
     nameForUrl = leet_code["titleSlug"]
 
     page_id = present_in_database(leetcode_number_input_by_user)
@@ -113,7 +121,42 @@ def main():
         print(
             f'Question {leetcode_number_input_by_user} updated (Last Done) in the Notion database.')
     else:
-        print("hi")
+        data = {
+            "Name": {
+                "title": [
+                    {
+                        "type": "text",
+                        "text": {
+                            "content": name,
+                        }
+                    }
+                ]
+            },
+            "Difficulty": {
+                "select": {
+                    "name": difficulty,
+                }
+            },
+            "Link": {
+                "url": f"{LEETCODE_URL}{nameForUrl}"
+            },
+            "Leetcode_ID": {
+                "number": leetcode_number_input_by_user
+            },
+            "Notes": {
+                "rich-text": [
+                    {
+                        "type": "text",
+                        "text": {
+                            "content": leetcode_comment_input_by_user
+                        }
+                    }
+                ]
+            },
+        }
+        
+        create_page(data)
+        print(f"Question {leetcode_number_input_by_user} added to the Notion database.")
 
 
 if __name__ == '__main__':
