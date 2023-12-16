@@ -60,6 +60,8 @@ def create_page(data: dict):
             "properties": data}
     res = requests.post(create_url, json = payload, headers = headers)
 
+    print(data) 
+    print(res)
     return res
 
 def present_in_database(leetcode_number):
@@ -125,9 +127,8 @@ def main():
             "Name": {
                 "title": [
                     {
-                        "type": "text",
                         "text": {
-                            "content": name,
+                            "content": name
                         }
                     }
                 ]
@@ -143,16 +144,7 @@ def main():
             "Leetcode_ID": {
                 "number": leetcode_number_input_by_user
             },
-            "Notes": {
-                "rich-text": [
-                    {
-                        "type": "text",
-                        "text": {
-                            "content": leetcode_comment_input_by_user
-                        }
-                    }
-                ]
-            },
+            "Notes": {"rich_text": [{"text": {"content": leetcode_comment_input_by_user}}]},
         }
         
         create_page(data)
