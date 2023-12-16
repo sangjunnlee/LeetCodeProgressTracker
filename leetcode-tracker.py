@@ -5,6 +5,8 @@ from requests.exceptions import HTTPError, ConnectionError, Timeout, RequestExce
 import sys
 from dotenv import load_dotenv
 import os
+from datetime import date
+
 
 load_dotenv()
 
@@ -43,6 +45,7 @@ def get_leetcode_info_by_id(id):
     except RequestException as err:
         sys.exit(err)
 
+
 def update_page(page_id: str, data:dict):
     url = f"https://api.notion.com/v1/pages/{page_id}"
 
@@ -59,9 +62,6 @@ def create_page(data: dict):
                 "database_id" : DATABASE_ID}, 
             "properties": data}
     res = requests.post(create_url, json = payload, headers = headers)
-
-    print(data) 
-    print(res)
     return res
 
 def present_in_database(leetcode_number):
@@ -76,6 +76,7 @@ def present_in_database(leetcode_number):
     url = f"https://api.notion.com/v1/databases/{DATABASE_ID}/query"
 
     response = requests.post(url, json=filterProperties, headers=headers)
+
     data = response.json()
 
     results = data["results"]
@@ -105,11 +106,18 @@ def main():
 
     page_id = present_in_database(leetcode_number_input_by_user)
 
+    current_date = date.today()
+    last_done = current_date.strftime("%Y-%m-%d")
     if page_id is not None:
         if leetcode_comment_input_by_user != "":
             updateData = {
                 "Leetcode_ID": {
                     "number": leetcode_number_input_by_user
+                },
+                "Last_Done": {
+                    "date": {
+                        "start": last_done
+                    }
                 },
                 "Notes": {"rich_text": [{"text": {"content": leetcode_comment_input_by_user}}]},
             }
@@ -140,6 +148,11 @@ def main():
             },
             "Link": {
                 "url": f"{LEETCODE_URL}{nameForUrl}"
+            },
+            "Last_Done": {
+                "date": {
+                    "start": last_done
+                }
             },
             "Leetcode_ID": {
                 "number": leetcode_number_input_by_user
