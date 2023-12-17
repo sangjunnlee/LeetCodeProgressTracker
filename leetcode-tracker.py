@@ -8,6 +8,7 @@ import os
 from datetime import date
 
 
+
 load_dotenv()
 
 NOTION_TOKEN = os.getenv("NOTION_TOKEN")
