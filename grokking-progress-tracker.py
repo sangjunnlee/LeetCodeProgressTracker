@@ -55,7 +55,6 @@ def get_topics():
 
 
 def main():
-    print(get_topics())
     return get_topic_and_lessons()
 
 if __name__ == '__main__':
