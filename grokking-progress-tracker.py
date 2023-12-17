@@ -44,8 +44,18 @@ def get_topic_and_lessons():
     except RequestException as err:
         sys.exit(err)
 
+def get_topics():
+    response = requests.get(GROKKING_URL)
+    response = response.json()
+    topics = []
+
+    for topic in response['data']:
+        topics.append(topic['title'])
+    return topics
+
+
 def main():
-    print(get_topic_and_lessons())
+    print(get_topics())
     return get_topic_and_lessons()
 
 if __name__ == '__main__':
